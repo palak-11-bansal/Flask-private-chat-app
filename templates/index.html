@@ -1,0 +1,59 @@
+<html>
+<head>
+<title>Chat Room</title>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+$(document).ready(function() {
+	// create a new namespace for private chat
+	var private_socket = io('http://127.0.0.1:5000/chat')
+
+	// private_socket.on('connect', function () {
+	// 	var user_profile_id = "add user id here"
+	// 	private_socket.emit('user_profile_id', user_profile_id);
+	// })
+	
+	$('#send_user_profile_id').on('click', function() {
+		var user_profile_id = $('#user_profile_id').val()
+		private_socket.emit('user_profile_id', user_profile_id);
+	});
+
+	$('#send_private_message').on('click', function () {
+		
+        var sender_username = $('#sender_username').val();
+		var sender_profile_id = $('#user_to_send_profile_id').val();
+		var recipient_profile_id = $('#send_to_user_profile_id').val();
+		var message_to_send = $('#private_message').val();
+		var jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTkyMDQyMzY1LCJqdGkiOiI0NjM2OTQwODFjMzk0OThmYTc4MTU0OTk2ZDY5MDQwZSIsInVzZXJfaWQiOjZ9.T-pBwFWS9pNCD8nSvHWd87Pdo43KJPaP2D32rUXr01c"
+		var payload = {
+            'sender_username': sender_username,
+            'sender_profile_id': sender_profile_id,
+			'recipient_profile_id': recipient_profile_id,
+			'message': message_to_send,
+			'jwt_token': jwt_token
+		}
+		private_socket.emit('private_message', payload);
+	});
+
+	private_socket.on('new_private_message', function(data_received) {
+		alert(`${data_received.message} ${data_received.username}`);
+		
+	});
+});
+</script>
+<br>
+<br>
+<input type="text" id="user_profile_id">
+<button id="send_user_profile_id">First send Your User Profile ID To the Server to register yourself</button>
+<br>
+<br>
+
+Send to person's user profile id: <input type="text" id="send_to_user_profile_id">
+sender's id : <input type = "text" id="user_to_send_profile_id" >
+Sender username : <input type = "text" id="sender_username" >
+Message: <input type="text" id="private_message">
+<button id="send_private_message">Send</button>
+</body>
+</html>
